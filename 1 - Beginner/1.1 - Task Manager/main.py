@@ -3,7 +3,9 @@ from pathlib import Path
 from datetime import datetime
 from src.task_manager import TaskManager
 from src.utils import (
-    create_tasks_json_if_not_exists
+    create_tasks_json_if_not_exists,
+    validate_task_id,
+    validate_priority
 )
 
 def create_argparse():
@@ -27,19 +29,27 @@ def create_argparse():
 
 def validate_args(args: argparse.Namespace):
     try:
-        if args.create != None:
-            if args.priority == None:
-                raise Exception("Prioirity arg is missing")
-            elif args.due_date == None:
+        if args.create is not None:
+            if args.priority is None:
+                raise Exception("Priority arg is missing")
+            elif args.due_date is None:
                 raise Exception("Due Date arg is missing")
-            elif args.category == None:
+            elif args.category is None:
                 raise Exception("Category arg is missing")
         
-        if args.priority != None and args.priority not in ["LOW", "MEDIUM", "HIGH"]:
+        if args.priority is not None and not validate_priority(args.priority):
             raise Exception("Arg Priority not in Priority Levels.")
 
-        if args.due_date != None and datetime.strptime(args.due_date, "%Y-%m-%d %H:%M") < datetime.today():
+        if args.due_date is not None and datetime.strptime(args.due_date, "%Y-%m-%d %H:%M") < datetime.now():
             raise Exception("Arg Due Date is in the past, set a future date.")
+        
+        # Validate task IDs for operations that need them
+        if args.update and not validate_task_id(args.update):
+            raise Exception("Invalid task ID for update operation.")
+        if args.delete and not validate_task_id(args.delete):
+            raise Exception("Invalid task ID for delete operation.")
+        if args.is_completed and not validate_task_id(args.is_completed):
+            raise Exception("Invalid task ID for toggle completion operation.")
     except Exception as e:
         print(f"Args Validation Failed: {e}")
         return False
@@ -72,7 +82,7 @@ def main():
         raise Exception("Failed to create database!")
     
     # 3. If provided create task, then create task and insert to db
-    if args.create != None:
+    if args.create is not None:
         if task_manager.create_task(args.create, args.priority, args.due_date, args.category):
             print("Successfully Created Task!")
         else:

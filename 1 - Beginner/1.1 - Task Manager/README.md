@@ -1,42 +1,116 @@
 # 1.1 Task Manager
 
-Build a professional CLI based Task Manager.
+A CLI-based Task Manager built with Python and SQLite.
 
-Let's think what all needs to be implemented to have a Professional Task Manager.
+## Features
 
-First Goal:
+### Core Functionality (CRUD Operations)
+- **Create** - Add new tasks with title, description, priority, due date, and category
+- **Read** - List all tasks with formatted output
+- **Update** - Modify existing tasks
+- **Delete** - Remove tasks by ID
+- **Toggle Complete** - Mark tasks as complete/incomplete
 
-1. CRUD operations:
-    - Create - The program must be able to create tasks.
-    - Read - The program must get all the tasks when required to view.
-    - Update - The program must be able to get the task, then following with an update operation to update the task.
-    - Delete - The program must be able to delete the task.
+### Features
+- **Priority Levels**: HIGH, MEDIUM, LOW
+- **Due Dates**: Set deadlines with datetime support
+- **Categories**: Organize tasks (Work, Personal, Academic, etc.)
+- **Search**: Filter by priority, category, or date range
+- **Sort**: Order tasks by priority, due date, or creation date
 
-Second Goal:
+## Installation
 
-2. How are we gonna do the CRUD operations:
-    - First through JSON - add tasks, then list tasks would be the first to be implemented.
-    - We will migrate from JSON to SQLite which would also include the learning of Databases. (Future goal)
+```bash
+# Install dependencies
+pip install -r requirements.txt
+```
 
+## Usage
 
-Third Goal:
+### Create a Task
+```bash
+python main.py -c "Complete project" -p HIGH -dd "2026-01-15 10:00" -cat "Work"
+```
 
-3. Implement basic features:
-    - Currently we only have basic CRUD operations. But we must also add complete task. Error handling and Input Validation is also required.
-    - Only CLI based application.
+### List All Tasks
+```bash
+python main.py -l
+```
 
-Fourth Goal:
+### Update a Task
+```bash
+python main.py -u 1
+```
 
-4. Now advanced features:
-    - Have priority levels (HIGH, MEDIUM, LOW).
-    - Add due dates with datetime.
-    - Add categories/tags.
-    - Implement search via priority, date, or category.
-    - Sort tasks based on criteria.
+### Delete a Task
+```bash
+python main.py -d 1
+```
 
-Fifth Goal and Final Goal:
+### Toggle Task Completion
+```bash
+python main.py -ic 1
+```
 
-5. Need to write tests and docstring for the project.
+### Search Tasks
+```bash
+python main.py -s
+```
 
+### Sort Tasks
+```bash
+python main.py -so
+```
 
->I have successfully built the project, but still the TEST CASES is one thing which I am not at all able to figure out.
+## Testing
+
+Run all tests:
+```bash
+pytest test_task_manager.py -v
+```
+
+Run with coverage:
+```bash
+pytest test_task_manager.py --cov=src
+```
+
+Run specific tests:
+```bash
+pytest test_task_manager.py -k "toggle"
+```
+
+## Project Structure
+
+```
+1.1 - Task Manager/
+├── main.py                 # Entry point with CLI argument parsing
+├── src/
+│   ├── task_manager.py    # TaskManager class with all operations
+│   └── utils.py           # Helper functions and validation
+├── tasks/
+│   └── task_manager.db    # SQLite database (auto-created)
+├── test_task_manager.py   # Comprehensive test suite
+├── requirements.txt       # Python dependencies
+├── .gitignore            # Git ignore patterns
+└── README.md             # This file
+```
+
+## Development Journey
+
+### Goals Achieved
+
+✅ **First Goal**: CRUD operations  
+✅ **Second Goal**: Migrated from JSON to SQLite  
+✅ **Third Goal**: Error handling, input validation, CLI interface  
+✅ **Fourth Goal**: Priority levels, due dates, categories, search, sort  
+✅ **Fifth Goal**: Comprehensive test suite with pytest
+
+## Code Quality Improvements
+
+- ✅ Fixed SQL injection vulnerabilities (using parameterized queries)
+- ✅ Added docstrings to all methods
+- ✅ Removed commented-out code
+- ✅ Added input validation helpers
+- ✅ Cleaned up unused imports
+- ✅ Added requirements.txt and .gitignore
+- ✅ Comprehensive test coverage including toggle_completed

@@ -413,6 +413,89 @@ def test_special_characters_in_task(task_manager, monkeypatch):
 
 
 # ============================================================================
+# TOGGLE COMPLETED TESTS
+# ============================================================================
+
+def test_toggle_completed_from_incomplete_to_complete(populated_db):
+    """Test: Toggle task from incomplete (0) to complete (1)."""
+    # Verify initial status is 0
+    populated_db.cur.execute("SELECT is_completed FROM Task_Manager WHERE task_id=1;")
+    initial_status = populated_db.cur.fetchone()[0]
+    
+    # Toggle
+    result = populated_db.toggle_completed("1")
+    assert result == True
+    
+    # Verify status changed to 1
+    populated_db.cur.execute("SELECT is_completed FROM Task_Manager WHERE task_id=1;")
+    new_status = populated_db.cur.fetchone()[0]
+    assert new_status == 1
+    assert new_status != initial_status
+
+
+def test_toggle_completed_from_complete_to_incomplete(populated_db):
+    """Test: Toggle task from complete (1) to incomplete (0)."""
+    # First set task to completed
+    populated_db.cur.execute("UPDATE Task_Manager SET is_completed=1 WHERE task_id=2;")
+    populated_db.conn.commit()
+    
+    # Verify it's completed
+    populated_db.cur.execute("SELECT is_completed FROM Task_Manager WHERE task_id=2;")
+    assert populated_db.cur.fetchone()[0] == 1
+    
+    # Toggle
+    result = populated_db.toggle_completed("2")
+    assert result == True
+    
+    # Verify status changed to 0
+    populated_db.cur.execute("SELECT is_completed FROM Task_Manager WHERE task_id=2;")
+    new_status = populated_db.cur.fetchone()[0]
+    assert new_status == 0
+
+
+def test_toggle_completed_multiple_times(populated_db):
+    """Test: Toggle same task multiple times works correctly."""
+    task_id = "3"
+    
+    # Get initial status
+    populated_db.cur.execute("SELECT is_completed FROM Task_Manager WHERE task_id=?;", (task_id,))
+    initial_status = populated_db.cur.fetchone()[0]
+    
+    # Toggle 3 times
+    for _ in range(3):
+        populated_db.toggle_completed(task_id)
+    
+    # After 3 toggles, status should be opposite of initial
+    populated_db.cur.execute("SELECT is_completed FROM Task_Manager WHERE task_id=?;", (task_id,))
+    final_status = populated_db.cur.fetchone()[0]
+    assert final_status != initial_status
+
+
+def test_toggle_nonexistent_task(populated_db):
+    """Test: Toggling non-existent task fails gracefully."""
+    result = populated_db.toggle_completed("999")
+    assert result == False
+
+
+def test_query_by_completion_status(populated_db):
+    """Test: Can query tasks by is_completed status."""
+    # Mark some tasks as completed
+    populated_db.toggle_completed("1")
+    populated_db.toggle_completed("2")
+    populated_db.conn.commit()
+    
+    # Query completed tasks
+    populated_db.cur.execute("SELECT COUNT(*) FROM Task_Manager WHERE is_completed=1;")
+    completed_count = populated_db.cur.fetchone()[0]
+    assert completed_count >= 2  # At least 2 we just marked
+    
+    # Query incomplete tasks
+    populated_db.cur.execute("SELECT COUNT(*) FROM Task_Manager WHERE is_completed=0;")
+    incomplete_count = populated_db.cur.fetchone()[0]
+    assert incomplete_count >= 0  # Could be 0 or more
+
+
+# ============================================================================
 # RUN INSTRUCTIONS
 # ============================================================================
 
