@@ -1,0 +1,242 @@
+{
+    "1": {
+        "title": "Complete Task Manager Project",
+        "description": "1.1 Project - Task Manager doing currently",
+        "created_at": "2026-01-01T13:45:49.269447",
+        "priority": "HIGH",
+        "due_date": "2026-01-01T16:00:00",
+        "category": "Python project"
+    },
+    "2": {
+        "title": "Grocery Shopping",
+        "description": "Buy milk, eggs, bread, and vegetables",
+        "created_at": "2026-01-01T09:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-02T18:00:00",
+        "category": "Personal"
+    },
+    "3": {
+        "title": "Prepare Thesis Proposal",
+        "description": "Draft initial research proposal for Master thesis on Stable Diffusion",
+        "created_at": "2026-01-01T08:30:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-15T23:59:00",
+        "category": "Academic"
+    },
+    "4": {
+        "title": "Fix Bug in Django App",
+        "description": "Resolve authentication issue in production server",
+        "created_at": "2026-01-01T10:15:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-03T12:00:00",
+        "category": "Python project"
+    },
+    "5": {
+        "title": "Schedule Doctor Appointment",
+        "description": "Annual health checkup with Dr. Smith",
+        "created_at": "2026-01-01T11:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-10T09:00:00",
+        "category": "Personal"
+    },
+    "6": {
+        "title": "Team Meeting Preparation",
+        "description": "Prepare slides for weekly team standup",
+        "created_at": "2026-01-01T14:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-06T10:00:00",
+        "category": "Work"
+    },
+    "7": {
+        "title": "Study Machine Learning Chapter 5",
+        "description": "Review neural networks and backpropagation algorithms",
+        "created_at": "2026-01-02T08:00:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-08T20:00:00",
+        "category": "Academic"
+    },
+    "8": {
+        "title": "Pay Utility Bills",
+        "description": "Electricity, water, and internet bills due",
+        "created_at": "2026-01-02T09:30:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-05T23:59:00",
+        "category": "Finance"
+    },
+    "9": {
+        "title": "Organize Desk Workspace",
+        "description": "Clean and reorganize home office desk",
+        "created_at": "2026-01-02T10:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-20T18:00:00",
+        "category": "Personal"
+    },
+    "10": {
+        "title": "Code Review for PR #234",
+        "description": "Review teammate's pull request on new feature implementation",
+        "created_at": "2026-01-02T11:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-04T17:00:00",
+        "category": "Work"
+    },
+    "11": {
+        "title": "Update React Components",
+        "description": "Migrate class components to functional components with hooks",
+        "created_at": "2026-01-02T13:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-25T23:59:00",
+        "category": "JavaScript project"
+    },
+    "12": {
+        "title": "Research Paper Literature Review",
+        "description": "Read and summarize 10 papers on generative AI models",
+        "created_at": "2026-01-03T08:00:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-12T23:59:00",
+        "category": "Academic"
+    },
+    "13": {
+        "title": "Gym Workout",
+        "description": "Leg day - squats, lunges, and cardio",
+        "created_at": "2026-01-03T06:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-03T19:00:00",
+        "category": "Health"
+    },
+    "14": {
+        "title": "Database Optimization",
+        "description": "Optimize SQL queries and add indexes to improve performance",
+        "created_at": "2026-01-03T09:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-07T15:00:00",
+        "category": "Work"
+    },
+    "15": {
+        "title": "Birthday Gift Shopping",
+        "description": "Buy birthday present for Mom",
+        "created_at": "2026-01-03T12:00:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-09T20:00:00",
+        "category": "Personal"
+    },
+    "16": {
+        "title": "Write Unit Tests",
+        "description": "Add unit tests for authentication module",
+        "created_at": "2026-01-03T14:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-11T17:00:00",
+        "category": "Python project"
+    },
+    "17": {
+        "title": "Learn Rust Basics",
+        "description": "Complete Rust programming tutorial chapters 1-5",
+        "created_at": "2026-01-04T08:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-30T23:59:00",
+        "category": "Learning"
+    },
+    "18": {
+        "title": "Quarterly Budget Planning",
+        "description": "Plan personal budget for Q1 2026",
+        "created_at": "2026-01-04T10:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-14T18:00:00",
+        "category": "Finance"
+    },
+    "19": {
+        "title": "Docker Container Setup",
+        "description": "Containerize microservices architecture",
+        "created_at": "2026-01-04T11:30:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-13T16:00:00",
+        "category": "DevOps"
+    },
+    "20": {
+        "title": "Call Parents",
+        "description": "Weekly check-in call with family",
+        "created_at": "2026-01-04T16:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-05T20:00:00",
+        "category": "Personal"
+    },
+    "21": {
+        "title": "API Documentation",
+        "description": "Write comprehensive API documentation using Swagger",
+        "created_at": "2026-01-05T09:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-18T17:00:00",
+        "category": "Work"
+    },
+    "22": {
+        "title": "Deep Learning Assignment",
+        "description": "Complete CNN implementation assignment for course",
+        "created_at": "2026-01-05T10:00:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-16T23:59:00",
+        "category": "Academic"
+    },
+    "23": {
+        "title": "Meal Prep Sunday",
+        "description": "Prepare meals for the entire week",
+        "created_at": "2026-01-05T07:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-05T15:00:00",
+        "category": "Health"
+    },
+    "24": {
+        "title": "Refactor Authentication Service",
+        "description": "Improve code quality and add better error handling",
+        "created_at": "2026-01-05T13:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-28T17:00:00",
+        "category": "Python project"
+    },
+    "25": {
+        "title": "Setup CI/CD Pipeline",
+        "description": "Configure GitHub Actions for automated testing and deployment",
+        "created_at": "2026-01-06T08:00:00.000000",
+        "priority": "HIGH",
+        "due_date": "2026-01-17T16:00:00",
+        "category": "DevOps"
+    },
+    "26": {
+        "title": "Read Book - Atomic Habits",
+        "description": "Finish reading chapters 6-10",
+        "created_at": "2026-01-06T19:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-22T23:59:00",
+        "category": "Personal"
+    },
+    "27": {
+        "title": "Tax Documents Preparation",
+        "description": "Gather all necessary documents for tax filing",
+        "created_at": "2026-01-06T14:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-19T18:00:00",
+        "category": "Finance"
+    },
+    "28": {
+        "title": "Performance Testing",
+        "description": "Load test the application using JMeter",
+        "created_at": "2026-01-07T09:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-21T17:00:00",
+        "category": "Work"
+    },
+    "29": {
+        "title": "Conference Registration",
+        "description": "Register for AI/ML conference in March",
+        "created_at": "2026-01-07T11:00:00.000000",
+        "priority": "MEDIUM",
+        "due_date": "2026-01-24T23:59:00",
+        "category": "Academic"
+    },
+    "30": {
+        "title": "Bike Maintenance",
+        "description": "Service bicycle and replace brake pads",
+        "created_at": "2026-01-07T15:00:00.000000",
+        "priority": "LOW",
+        "due_date": "2026-01-27T18:00:00",
+        "category": "Personal"
+    }
+}
