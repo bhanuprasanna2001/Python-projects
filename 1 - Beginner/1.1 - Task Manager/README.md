@@ -1,116 +1,74 @@
-# 1.1 Task Manager
+# Task Manager
 
-A CLI-based Task Manager built with Python and SQLite.
+A CLI task management application with SQLite persistence.
 
 ## Features
 
-### Core Functionality (CRUD Operations)
-- **Create** - Add new tasks with title, description, priority, due date, and category
-- **Read** - List all tasks with formatted output
-- **Update** - Modify existing tasks
-- **Delete** - Remove tasks by ID
-- **Toggle Complete** - Mark tasks as complete/incomplete
-
-### Features
-- **Priority Levels**: HIGH, MEDIUM, LOW
-- **Due Dates**: Set deadlines with datetime support
-- **Categories**: Organize tasks (Work, Personal, Academic, etc.)
-- **Search**: Filter by priority, category, or date range
-- **Sort**: Order tasks by priority, due date, or creation date
+- Create, read, update, delete tasks
+- Toggle task completion status
+- Search by priority, category, or date range
+- Sort by due date, priority, or creation time
+- Persistent SQLite storage
 
 ## Installation
 
 ```bash
-# Install dependencies
 pip install -r requirements.txt
 ```
 
 ## Usage
 
-### Create a Task
 ```bash
-python main.py -c "Complete project" -p HIGH -dd "2026-01-15 10:00" -cat "Work"
-```
+# Create a task
+python -m task_manager create "Review PR" --priority HIGH --due "2026-01-10 14:00" --category Work
 
-### List All Tasks
-```bash
-python main.py -l
-```
+# List all tasks
+python -m task_manager list
 
-### Update a Task
-```bash
-python main.py -u 1
-```
+# Update a task
+python -m task_manager update 1
 
-### Delete a Task
-```bash
-python main.py -d 1
-```
+# Delete a task
+python -m task_manager delete 1
 
-### Toggle Task Completion
-```bash
-python main.py -ic 1
-```
+# Toggle completion
+python -m task_manager toggle 1
 
-### Search Tasks
-```bash
-python main.py -s
-```
+# Search tasks
+python -m task_manager search --priority HIGH
+python -m task_manager search --category Work
+python -m task_manager search --from "2026-01-01 00:00" --to "2026-01-31 23:59"
 
-### Sort Tasks
-```bash
-python main.py -so
-```
-
-## Testing
-
-Run all tests:
-```bash
-pytest test_task_manager.py -v
-```
-
-Run with coverage:
-```bash
-pytest test_task_manager.py --cov=src
-```
-
-Run specific tests:
-```bash
-pytest test_task_manager.py -k "toggle"
+# Sort tasks
+python -m task_manager list --sort-by priority
+python -m task_manager list --sort-by due_date
 ```
 
 ## Project Structure
 
 ```
-1.1 - Task Manager/
-├── main.py                 # Entry point with CLI argument parsing
-├── src/
-│   ├── task_manager.py    # TaskManager class with all operations
-│   └── utils.py           # Helper functions and validation
-├── tasks/
-│   └── task_manager.db    # SQLite database (auto-created)
-├── test_task_manager.py   # Comprehensive test suite
-├── requirements.txt       # Python dependencies
-├── .gitignore            # Git ignore patterns
-└── README.md             # This file
+ref_tm/
+├── task_manager/
+│   ├── __init__.py
+│   ├── __main__.py      # CLI entry point
+│   ├── cli.py           # Argument parsing
+│   ├── models.py        # Task dataclass
+│   ├── repository.py    # Database operations
+│   ├── service.py       # Business logic
+│   └── display.py       # Output formatting
+├── tests/
+│   ├── __init__.py
+│   ├── Figuring out
+│   ├── Figuring out
+│   └── Figuring out
+├── requirements.txt
+└── README.md
 ```
 
-## Development Journey
+## Design Principles
 
-### Goals Achieved
-
-✅ **First Goal**: CRUD operations  
-✅ **Second Goal**: Migrated from JSON to SQLite  
-✅ **Third Goal**: Error handling, input validation, CLI interface  
-✅ **Fourth Goal**: Priority levels, due dates, categories, search, sort  
-✅ **Fifth Goal**: Comprehensive test suite with pytest
-
-## Code Quality Improvements
-
-- ✅ Fixed SQL injection vulnerabilities (using parameterized queries)
-- ✅ Added docstrings to all methods
-- ✅ Removed commented-out code
-- ✅ Added input validation helpers
-- ✅ Cleaned up unused imports
-- ✅ Added requirements.txt and .gitignore
-- ✅ Comprehensive test coverage including toggle_completed
+- **Single Responsibility**: Each module has one clear purpose
+- **Dependency Injection**: Repository injected into service for testability
+- **Type Safety**: Full type hints throughout
+- **Immutable Data**: Task model uses frozen dataclass
+- **Clean Interfaces**: Clear boundaries between layers
