@@ -192,7 +192,7 @@ def main() -> int:
     args = parser.parse_args()
     
     # Initialize components
-    db_path = Path(__file__).parent.parent / "data" / "task_manager.db"
+    db_path = Path(__file__).parent.parent / "data" / "tasks.db"
     repository = TaskRepository(db_path)
     service = TaskService(repository)
     cli = CLI(service)
