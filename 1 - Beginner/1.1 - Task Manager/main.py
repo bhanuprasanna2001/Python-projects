@@ -136,61 +136,6 @@ def main():
     else:
         raise Exception(f"SQL Commit and Closing couldn't happen")
     
-    ### JSON Version
-    
-    # TASKS_JSON_PATH = PROJECT_ROOT / "tasks" / "tasks.json"
-    
-    # # 1. Create tasks.json if not available
-    # create_tasks_json_if_not_exists(TASKS_JSON_PATH)
-    
-    # task_manager = TaskManager()
-    # if not task_manager.open_json(TASKS_JSON_PATH):
-    #     raise Exception("JSON loading couldn't happen")
-    
-    # # 2. If provided create task, then create task and push to json
-    # if args.create != None:
-    #     if task_manager.create_task(args.create, args.priority, args.due_date, args.category):
-    #         print("Successfully Created Task!")
-    #     else:
-    #         raise Exception("Failed to Create Task!")
-    
-    # # 3. If asked to List tasks, list tasks
-    # if args.list:
-    #     if task_manager.list_tasks():
-    #         print("Succesfully Listed Tasks!")
-    #     else:
-    #         raise Exception("Failed to List Tasks!")
-            
-    # # 4. If asked to update task based on ID, then update
-    # if args.update:
-    #     if task_manager.update_tasks(args.update):
-    #         print("Successfully Updated Tasks!")
-    #     else:
-    #         raise Exception("Failed to Update Tasks!")
-            
-    # # 5. If asked to delete task based on ID, then delete
-    # if args.delete:
-    #     if task_manager.delete_tasks(args.delete):
-    #         print("Successfully Deleted Tasks!")
-    #     else:
-    #         raise Exception("Failed to Delete Tasks!")
-        
-    # # 6. Search Tasks
-    # if args.search:
-    #     if task_manager.search_tasks():
-    #         print("Successfully Search completed!")
-    #     else:
-    #         raise Exception("Failed to Search!")
-        
-    # # 7. Sort Tasks
-    # if args.sort:
-    #     if task_manager.sort_tasks():
-    #         print("Successfully Sort completed!")
-    #     else:
-    #         raise Exception("Failed to Sort!")
-            
-    # if not task_manager.dump_json():
-    #     raise Exception(f"JSON Dump couldn't happen")
     
 if __name__ == "__main__":
     try:
