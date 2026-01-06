@@ -2,9 +2,9 @@
 tabulate
 
 # Development dependencies
-pytest
-pytest-cov
-ruff
 mypy
+ruff
 bandit
+pytest
 pip-audit
+pytest-cov
