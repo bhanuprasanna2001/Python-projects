@@ -1,3 +1,10 @@
+# Runtime dependencies
 tabulate
+
+# Development dependencies
 pytest
 pytest-cov
+ruff
+mypy
+bandit
+pip-audit

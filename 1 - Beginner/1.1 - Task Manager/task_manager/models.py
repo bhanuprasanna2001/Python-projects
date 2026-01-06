@@ -5,30 +5,29 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 
 class Priority(Enum):
     """Task priority levels."""
-    
+
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
-    
+
     @classmethod
     def from_string(cls, value: str) -> Priority:
         """Parse priority from string, case-insensitive."""
         try:
             return cls[value.upper()]
-        except KeyError:
+        except KeyError as err:
             valid = ", ".join(p.value for p in cls)
-            raise ValueError(f"Invalid priority '{value}'. Must be one of: {valid}")
+            raise ValueError(f"Invalid priority '{value}'. Must be one of: {valid}") from err
 
 
 @dataclass(frozen=True)
 class Task:
     """Immutable task representation.
-    
+
     Attributes:
         id: Unique task identifier (None for new tasks).
         title: Task title (required).
@@ -39,16 +38,16 @@ class Task:
         due_date: Optional due date.
         category: Task category.
     """
-    
+
     title: str
     description: str = ""
     is_completed: bool = False
-    created_at: Optional[datetime] = None
+    created_at: datetime | None = None
     priority: Priority = Priority.MEDIUM
-    due_date: Optional[datetime] = None
+    due_date: datetime | None = None
     category: str = ""
-    id: Optional[int] = None
-    
+    id: int | None = None
+
     def __post_init__(self) -> None:
         """Validate task data."""
         if not self.title or not self.title.strip():
@@ -59,15 +58,15 @@ class Task:
             raise ValueError("Description cannot exceed 1000 characters")
         if len(self.category) > 50:
             raise ValueError("Category cannot exceed 50 characters")
-    
+
     def with_updates(
         self,
-        title: Optional[str] = None,
-        description: Optional[str] = None,
-        is_completed: Optional[bool] = None,
-        priority: Optional[Priority] = None,
-        due_date: Optional[datetime] = None,
-        category: Optional[str] = None,
+        title: str | None = None,
+        description: str | None = None,
+        is_completed: bool | None = None,
+        priority: Priority | None = None,
+        due_date: datetime | None = None,
+        category: str | None = None,
     ) -> Task:
         """Create a new Task with updated fields."""
         return Task(
@@ -80,7 +79,7 @@ class Task:
             due_date=due_date if due_date is not None else self.due_date,
             category=category if category is not None else self.category,
         )
-    
+
     def toggle_completed(self) -> Task:
         """Return a new Task with toggled completion status."""
         return self.with_updates(is_completed=not self.is_completed)

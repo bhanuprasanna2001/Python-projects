@@ -139,7 +139,7 @@ classDiagram
 ```
 1.1 - Task Manager/
 ├── data/
-│   ├── tasks.db
+│   └── tasks.db
 ├── task_manager/
 │   ├── __init__.py
 │   ├── __main__.py      # CLI entry point
@@ -150,17 +150,46 @@ classDiagram
 │   └── display.py       # Output formatting
 ├── tests/
 │   ├── __init__.py
-│   ├── Figuring out
-│   ├── Figuring out
-│   └── Figuring out
+│   ├── test_models.py
+│   ├── test_repository.py
+│   └── test_service.py
+├── Makefile             # Development commands
+├── pyproject.toml       # Project configuration
 ├── requirements.txt
 └── README.md
 ```
+
+## Development
+
+### Code Quality Commands
+
+```bash
+make help       # Show all available commands
+make check      # Run ALL quality checks (lint, format, typecheck, security, test)
+make fix        # Auto-fix lint & format issues
+make lint       # Run Ruff linter
+make format     # Check code formatting
+make typecheck  # Run mypy strict type checking
+make security   # Run Bandit + pip-audit security scans
+make test       # Run tests with coverage
+make clean      # Remove cache files
+```
+
+### Quality Tools
+
+| Tool | Purpose |
+|------|---------|
+| **Ruff** | Linting & formatting (PEP 8, imports, best practices) |
+| **mypy** | Static type checking (strict mode) |
+| **Bandit** | Security vulnerability scanning |
+| **pip-audit** | Dependency vulnerability checking |
+| **pytest-cov** | Test coverage reporting |
 
 ## Design Principles
 
 - **Single Responsibility**: Each module has one clear purpose
 - **Dependency Injection**: Repository injected into service for testability
-- **Type Safety**: Full type hints throughout
+- **Type Safety**: Full type hints throughout (mypy strict)
 - **Immutable Data**: Task model uses frozen dataclass
 - **Clean Interfaces**: Clear boundaries between layers
+- **SQL Injection Prevention**: Static query templates, no string interpolation

@@ -1,6 +1,7 @@
 """Display formatting for task output."""
 
-from typing import Sequence
+from collections.abc import Sequence
+from datetime import datetime
 
 from tabulate import tabulate
 
@@ -11,7 +12,7 @@ def format_tasks_table(tasks: Sequence[Task]) -> str:
     """Format tasks as a table string."""
     if not tasks:
         return "No tasks found."
-    
+
     headers = ["ID", "Title", "Done", "Priority", "Due Date", "Category", "Created"]
     rows = [
         [
@@ -33,14 +34,14 @@ def format_task_detail(task: Task) -> str:
     done = "Yes" if task.is_completed else "No"
     due = _format_date(task.due_date) or "Not set"
     created = _format_date(task.created_at) or "Unknown"
-    
+
     return f"""
 Task #{task.id}
-{'─' * 40}
+{"─" * 40}
 Title:       {task.title}
-Description: {task.description or '(none)'}
+Description: {task.description or "(none)"}
 Priority:    {task.priority.value}
-Category:    {task.category or '(none)'}
+Category:    {task.category or "(none)"}
 Completed:   {done}
 Due Date:    {due}
 Created:     {created}
@@ -54,7 +55,7 @@ def _truncate(text: str, max_len: int) -> str:
     return text[: max_len - 1] + "…"
 
 
-def _format_date(dt) -> str:
+def _format_date(dt: datetime | None) -> str:
     """Format datetime for display."""
     if dt is None:
         return ""
