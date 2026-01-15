@@ -9,19 +9,19 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.0",
-    "pytest-cov>=4.0",
-    "ruff>=0.8",
-    "mypy>=1.13",
-    "bandit>=1.8",
-    "pip-audit>=2.7",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+    "bandit",
+    "pip-audit",
 ]
 
 [project.scripts]
 task = "task_manager.cli:main"
 
 # ============================================================================
-# RUFF - Fast Python Linter & Formatter (replaces flake8, isort, black)
+# RUFF - Fast Python Linter & Formatter
 # ============================================================================
 [tool.ruff]
 target-version = "py311"
