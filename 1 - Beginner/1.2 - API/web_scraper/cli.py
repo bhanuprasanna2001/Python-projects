@@ -5,38 +5,40 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
-from pathlib import Path
-from datetime import datetime
 
-from web_scraper.parser import Parser
-from web_scraper.scraper import Scraper
 from web_scraper.config import ConfigManager
+from web_scraper.crawler import Crawler
 from web_scraper.exceptions import ScraperError, ConfigError
 from web_scraper.utils.logger import setup_logger
+from web_scraper.utils.rate_limiter import RateLimiter
 
 
-def parse_datetime(value: str) -> datetime:
-    """Parse datetime from string."""
-    try:
-        return datetime.strptime(value, "%Y-%m-%d %H:%M")
-    except ValueError as err:
-        raise argparse.ArgumentTypeError(
-            f"Invalid datetime format: '{value}'. Use: YYYY-MM-DD HH:MM"
-        ) from err
-        
-        
 def create_parser() -> argparse.ArgumentParser:
     """Create the argument parser."""
     parser = argparse.ArgumentParser(
         prog="web_scraper",
-        description="A clean CLI web scrapping application.",
+        description="Multi-page web scraper with rate limiting.",
     )
     
     parser.add_argument(
         "cfg_path",
         nargs="?",
         default="configs/sites.yaml",
-        help="YAML Config Path"
+        help="YAML config path"
+    )
+    parser.add_argument(
+        "--pages",
+        "-p",
+        type=int,
+        default=1,
+        help="Maximum pages to crawl (default: 1)"
+    )
+    parser.add_argument(
+        "--delay",
+        "-d",
+        type=float,
+        default=1.0,
+        help="Delay between requests in seconds (default: 1.0)"
     )
     parser.add_argument(
         "--verbose",
@@ -48,12 +50,11 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main() -> None:
+def main() -> int:
     """Main entry point."""
     parser = create_parser()
     args = parser.parse_args()
     
-    # Setup logging
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logger = setup_logger(level=log_level)
     
@@ -63,25 +64,26 @@ def main() -> None:
         cfg_manager = ConfigManager(args.cfg_path)
         config = cfg_manager.load_config()
         
-        site_url = config["sites"]["books"]["base_url"]
-        web_scraper = Scraper(url=site_url)
+        start_url = config["sites"]["books"]["base_url"]
         
-        scraped_content = web_scraper.fetch_sync()
-        web_parser = Parser(scraped_content)
+        rate_limiter = RateLimiter(default_delay=args.delay)
+        crawler = Crawler(rate_limiter=rate_limiter)
         
-        web_parser.parse()
+        total_books = 0
+        for result in crawler.crawl(start_url, max_pages=args.pages):
+            for book in result.books:
+                print(f"{book.title} - {book.price}")
+            total_books += len(result.books)
         
-        logger.info("Scraping completed successfully")
+        logger.info(f"Scraping complete. Total books: {total_books}")
+        return 0
     
     except ConfigError as e:
         logger.error(f"Configuration error: {e}")
-        sys.exit(1)
+        return 1
     except ScraperError as e:
         logger.error(f"Scraping failed: {e}")
-        sys.exit(1)
+        return 1
     except KeyboardInterrupt:
-        logger.warning("Scraping interrupted by user")
-        sys.exit(130)
-    except Exception as e:
-        logger.exception(f"Unexpected error: {e}")
-        sys.exit(1)
+        logger.warning("Interrupted by user")
+        return 130

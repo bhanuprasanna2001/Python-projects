@@ -4,7 +4,7 @@
 sites:
   books:
     name: "Books to Scrape"
-    base_url: "https://books.toscrape.com3845ureio"
+    base_url: "https://books.toscrape.com"
     
 #     # Rate limiting settings
 #     rate_limit:

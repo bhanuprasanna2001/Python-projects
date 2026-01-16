@@ -1,40 +1,59 @@
-"""Parser for the Scrapped Response"""
+"""Parser for scraped HTML content."""
 
 from __future__ import annotations
 
 import logging
+from urllib.parse import urljoin
+
 from bs4 import BeautifulSoup
 
 from web_scraper.exceptions import ParseError
+from web_scraper.models import Book
 
 logger = logging.getLogger(__name__)
 
 
 class Parser:
-    """Handles parsing the scrapped response
+    """Parses HTML content and extracts structured data.
     
-    This class uses the Beautiful Soap library for parsing.
+    Responsible only for parsing - no HTTP requests.
     """
     
-    def __init__(self, response_content: bytes) -> None:
-        """Initialize Parser"""
-        self.response_content = response_content
+    def __init__(self, content: bytes, base_url: str = "") -> None:
+        """Initialize parser with HTML content.
         
+        Args:
+            content: Raw HTML bytes to parse
+            base_url: Base URL for resolving relative links
+        """
+        self._base_url = base_url
         try:
-            self.soup = BeautifulSoup(self.response_content, "html.parser")
-            logger.debug("Initialized BeautifulSoup parser")
+            self._soup = BeautifulSoup(content, "html.parser")
         except Exception as e:
-            logger.error(f"Failed to initialize parser: {e}")
             raise ParseError(f"Invalid HTML content: {e}") from e
         
-    def parse(self) -> None:
-        """Parse response text with bs4 selectors.
+    def get_next_page_url(self) -> str | None:
+        """Extract next page URL if pagination exists.
         
+        Returns:
+            Absolute URL of next page, or None if no next page
+        """
+        next_link = self._soup.select_one("li.next > a")
+        if not next_link or "href" not in next_link.attrs:
+            return None
+        return urljoin(self._base_url, next_link["href"])
+        
+    def parse(self) -> list[Book]:
+        """Parse page content and extract Book objects.
+        
+        Returns:
+            List of parsed Book objects
+            
         Raises:
-            ParseError: If parsing fails or required elements are missing
+            ParseError: If required elements are missing
         """
         try:
-            ol_element = self.soup.find("ol")
+            ol_element = self._soup.find("ol")
             if not ol_element:
                 raise ParseError("Required <ol> element not found")
             
@@ -44,20 +63,20 @@ class Parser:
             
             logger.info(f"Found {len(li_results)} books to parse")
             
+            books: list[Book] = []
             for idx, li_result in enumerate(li_results, start=1):
                 try:
                     title = self._extract_title(li_result)
                     price = self._extract_price(li_result)
                     rating = self._extract_rating(li_result)
                     
-                    print(f"Book Title:  {title}")
-                    print(f"Book Price:  {price}")
-                    print(f"Book star :  {rating}")
-                    print()
+                    books.append(Book(title=title, price=price, rating=rating))
                     
                 except Exception as e:
                     logger.warning(f"Failed to parse book {idx}: {e}")
                     continue
+            
+            return books
                     
         except ParseError:
             raise

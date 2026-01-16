@@ -38,7 +38,7 @@ def retry(
                     attempt += 1
                     if attempt >= max_attempts:
                         logger.error(
-                            f"{func.__name__} failed after {max_attempts} attemps: {e}"
+                            f"{func.__name__} failed after {max_attempts} attempts: {e}"
                         )
                         raise
                     
