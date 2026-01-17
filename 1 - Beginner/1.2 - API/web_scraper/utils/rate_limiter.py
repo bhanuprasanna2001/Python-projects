@@ -24,10 +24,6 @@ class RateLimiter:
         self._last_request: dict[str, float] = defaultdict(float)
         self._domain_delays: dict[str, float] = {}
 
-    def set_domain_delay(self, domain: str, delay: float) -> None:
-        """Set custom delay for a specific domain."""
-        self._domain_delays[domain] = delay
-
     def wait(self, url: str) -> None:
         """Block until it's safe to request this URL's domain."""
         domain = urlparse(url).netloc
