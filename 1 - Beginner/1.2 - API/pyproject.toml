@@ -47,6 +47,7 @@ select = [
 ignore = [
     "PLR0913",  # Too many arguments (common in CLI apps)
     "PLR2004",  # Magic value comparison (acceptable in tests)
+    "PLC0415",  # Import not at top of file (lazy imports are intentional)
 ]
 
 [tool.ruff.lint.per-file-ignores]
