@@ -193,3 +193,7 @@ make clean      # Remove cache files
 - **Immutable Data**: Task model uses frozen dataclass
 - **Clean Interfaces**: Clear boundaries between layers
 - **SQL Injection Prevention**: Static query templates, no string interpolation
+
+## License
+
+MIT
