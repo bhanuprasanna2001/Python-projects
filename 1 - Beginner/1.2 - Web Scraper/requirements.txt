@@ -1,0 +1,13 @@
+# Runtime dependencies
+tabulate
+
+# Development dependencies
+mypy
+ruff
+bandit
+pytest
+asyncio
+aiohttp
+pip-audit
+pytest-cov
+beautifulsoup4
