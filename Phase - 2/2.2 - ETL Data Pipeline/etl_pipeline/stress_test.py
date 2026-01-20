@@ -16,7 +16,7 @@ import string
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import aiosqlite
 import polars as pl
@@ -24,6 +24,7 @@ import polars as pl
 from etl_pipeline.config import get_project_root, get_settings
 from etl_pipeline.loaders import SQLiteLoader
 from etl_pipeline.models import (
+    ExtractedRecord,
     GitHubRepository,
 )
 from etl_pipeline.orchestration.pipeline import Pipeline
@@ -394,6 +395,7 @@ class BenchmarkRunner:
 
         # Generate test data
         repos = self.generator.generate_github_repos(num_records)
+        records = cast(list[ExtractedRecord], repos)
 
         # Create transformer chain
         chain = TransformerChain(
@@ -406,7 +408,7 @@ class BenchmarkRunner:
 
         # Run benchmark
         start = time.perf_counter()
-        result = chain.execute(repos)
+        result = chain.execute(records)
         duration = time.perf_counter() - start
 
         throughput = num_records / duration
@@ -446,6 +448,7 @@ class BenchmarkRunner:
 
         # Generate and transform test data
         repos = self.generator.generate_github_repos(num_records)
+        records = cast(list[ExtractedRecord], repos)
 
         chain = TransformerChain(
             [
@@ -453,7 +456,7 @@ class BenchmarkRunner:
                 DataNormalizer(deduplicate=False),  # No dedup to test raw throughput
             ]
         )
-        transform_result = chain.execute(repos)
+        transform_result = chain.execute(records)
 
         # Create loader with temp database
         import tempfile
@@ -600,10 +603,11 @@ class BenchmarkRunner:
         """
         sizes = sizes or [1000, 10000, 50000]
 
-        all_results = {
+        all_results: dict[str, Any] = {
             "started_at": datetime.utcnow().isoformat() + "Z",
             "benchmarks": [],
         }
+        benchmarks: list[dict[str, Any]] = []
 
         for size in sizes:
             logger.info(f"\n{'=' * 60}\nRunning benchmarks at size {size:,}\n{'=' * 60}")
@@ -611,12 +615,12 @@ class BenchmarkRunner:
             # Transformation benchmark
             trans_result = await self.benchmark_transformation(size)
             trans_result["size_tier"] = size
-            all_results["benchmarks"].append(trans_result)
+            benchmarks.append(trans_result)
 
             # Loading benchmark
             load_result = await self.benchmark_loading(size)
             load_result["size_tier"] = size
-            all_results["benchmarks"].append(load_result)
+            benchmarks.append(load_result)
 
             # Full pipeline benchmark (scaled down for book records)
             full_result = await self.benchmark_full_pipeline(
@@ -624,12 +628,13 @@ class BenchmarkRunner:
                 num_book_records=size // 2,
             )
             full_result["size_tier"] = size
-            all_results["benchmarks"].append(full_result)
+            benchmarks.append(full_result)
 
         all_results["completed_at"] = datetime.utcnow().isoformat() + "Z"
+        all_results["benchmarks"] = benchmarks
 
         # Summary
-        all_results["summary"] = self._compute_summary(all_results["benchmarks"])
+        all_results["summary"] = self._compute_summary(benchmarks)
 
         return all_results
 

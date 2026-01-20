@@ -19,11 +19,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from apscheduler.executors.asyncio import AsyncIOExecutor
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.executors.asyncio import AsyncIOExecutor  # type: ignore[import-untyped]
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore  # type: ignore[import-untyped]
+from apscheduler.schedulers.asyncio import AsyncIOScheduler  # type: ignore[import-untyped]
+from apscheduler.triggers.cron import CronTrigger  # type: ignore[import-untyped]
+from apscheduler.triggers.interval import IntervalTrigger  # type: ignore[import-untyped]
 
 from etl_pipeline.config import PipelineConfig, get_project_root
 from etl_pipeline.models import DataSource, JobStatus
@@ -340,7 +340,7 @@ class PipelineScheduler:
         logger.info(f"Running job {job_id} immediately")
         task = asyncio.create_task(self._run_pipeline(config))
         # Store task reference to prevent garbage collection
-        self._active_tasks = getattr(self, "_active_tasks", set())
+        self._active_tasks: set[asyncio.Task[Any]] = getattr(self, "_active_tasks", set())
         self._active_tasks.add(task)
         task.add_done_callback(self._active_tasks.discard)
         return True
@@ -441,7 +441,7 @@ class PipelineScheduler:
         # Set up signal handlers
         loop = asyncio.get_event_loop()
 
-        def signal_handler():
+        def signal_handler() -> None:
             logger.info("Shutdown signal received")
             self.stop(wait=True)
 

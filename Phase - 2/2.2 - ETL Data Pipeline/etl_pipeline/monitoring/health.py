@@ -140,7 +140,7 @@ class HealthChecker:
             return_exceptions=True,
         )
 
-        check_results = []
+        check_results: list[HealthCheckResult] = []
         for name, result in zip(self._checks.keys(), results, strict=False):
             if isinstance(result, Exception):
                 check_results.append(
@@ -150,7 +150,7 @@ class HealthChecker:
                         message=str(result),
                     )
                 )
-            else:
+            elif isinstance(result, HealthCheckResult):
                 check_results.append(result)
 
         # Determine overall status
@@ -175,10 +175,12 @@ class HealthChecker:
         """Check database connectivity."""
         try:
             settings = get_settings()
-            db_path = settings.loading.sqlite.path
+            db_path_raw = settings.loading.sqlite.path
 
-            if not Path(db_path).is_absolute():
-                db_path = get_project_root() / db_path
+            if not Path(db_path_raw).is_absolute():
+                db_path = str(get_project_root() / db_path_raw)
+            else:
+                db_path = db_path_raw
 
             if not Path(db_path).exists():
                 return HealthCheckResult(
@@ -260,10 +262,12 @@ class HealthChecker:
         """Check if pipeline has run recently."""
         try:
             settings = get_settings()
-            db_path = settings.loading.sqlite.path
+            db_path_raw = settings.loading.sqlite.path
 
-            if not Path(db_path).is_absolute():
-                db_path = get_project_root() / db_path
+            if not Path(db_path_raw).is_absolute():
+                db_path = str(get_project_root() / db_path_raw)
+            else:
+                db_path = db_path_raw
 
             if not Path(db_path).exists():
                 return HealthCheckResult(

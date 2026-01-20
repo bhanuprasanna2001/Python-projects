@@ -13,7 +13,7 @@ from __future__ import annotations
 import functools
 import time
 from collections import defaultdict
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -107,6 +107,7 @@ class MetricsRegistry:
     """
 
     _instance: MetricsRegistry | None = None
+    _initialized: bool = False
 
     def __new__(cls) -> MetricsRegistry:
         if cls._instance is None:
@@ -177,7 +178,7 @@ class MetricsRegistry:
         return self._timings.get(key, TimingStats())
 
     @contextmanager
-    def time(self, name: str, labels: dict[str, str] | None = None):
+    def time(self, name: str, labels: dict[str, str] | None = None) -> Generator[None, None, None]:
         """Context manager for timing a block of code."""
         start = time.perf_counter()
         try:
@@ -234,7 +235,9 @@ def reset_metrics() -> None:
 # --- Decorators ---
 
 
-def timed(name: str | None = None, labels: dict[str, str] | None = None):
+def timed(
+    name: str | None = None, labels: dict[str, str] | None = None
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Decorator to time a synchronous function.
 
@@ -265,7 +268,9 @@ def timed(name: str | None = None, labels: dict[str, str] | None = None):
     return decorator
 
 
-def async_timed(name: str | None = None, labels: dict[str, str] | None = None):
+def async_timed(
+    name: str | None = None, labels: dict[str, str] | None = None
+) -> Callable[[Callable[P, Awaitable[T]]], Callable[P, Awaitable[T]]]:
     """
     Decorator to time an async function.
 
@@ -296,7 +301,9 @@ def async_timed(name: str | None = None, labels: dict[str, str] | None = None):
     return decorator
 
 
-def counted(name: str | None = None, labels: dict[str, str] | None = None):
+def counted(
+    name: str | None = None, labels: dict[str, str] | None = None
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Decorator to count function calls.
 

@@ -277,11 +277,14 @@ class JobStore:
                 FROM jobs
             """)
             row = await cursor.fetchone()
-            totals = {
-                "extracted": row[0] or 0,
-                "transformed": row[1] or 0,
-                "loaded": row[2] or 0,
-            }
+            if row is not None:
+                totals = {
+                    "extracted": row[0] or 0,
+                    "transformed": row[1] or 0,
+                    "loaded": row[2] or 0,
+                }
+            else:
+                totals = {"extracted": 0, "transformed": 0, "loaded": 0}
 
             # Average duration for completed jobs
             cursor = await db.execute("""

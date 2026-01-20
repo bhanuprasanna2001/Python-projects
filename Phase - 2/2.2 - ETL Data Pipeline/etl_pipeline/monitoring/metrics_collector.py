@@ -181,8 +181,12 @@ class MetricsCollector:
             return {"metric": metric_name, "values": values, "trend": "insufficient_data"}
 
         # Calculate trend
-        first_val = values[0]["value"]
-        last_val = values[-1]["value"]
+        first_val: float | int | None = values[0]["value"]
+        last_val: float | int | None = values[-1]["value"]
+
+        # Handle None values
+        if first_val is None or last_val is None:
+            return {"metric": metric_name, "values": values, "trend": "insufficient_data"}
 
         if first_val == 0:
             change_pct = 100.0 if last_val > 0 else 0.0
