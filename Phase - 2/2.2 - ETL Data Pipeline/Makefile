@@ -10,7 +10,7 @@
 #   make scheduler  - Start the pipeline scheduler
 # =============================================================================
 
-.PHONY: help install dev-install run extract transform load scheduler status \
+.PHONY: help install dev-install run extract etl scheduler status \
         validate sources test test-cov lint format fix typecheck check clean \
         db-up db-down
 
@@ -25,10 +25,9 @@ help:
 	@echo "  make dev-install   - Install development dependencies"
 	@echo ""
 	@echo "Pipeline Execution:"
-	@echo "  make run           - Run full ETL pipeline"
-	@echo "  make extract       - Run extraction only"
-	@echo "  make transform     - Run transformation only"
-	@echo "  make load          - Run loading only"
+	@echo "  make run           - Run full ETL pipeline (extract → transform → load)"
+	@echo "  make extract       - Run extraction stage only"
+	@echo "  make etl           - Run extract + transform (no load)"
 	@echo "  make scheduler     - Start the scheduler"
 	@echo "  make status        - Show pipeline status"
 	@echo ""
@@ -83,21 +82,15 @@ run:
 
 extract:
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo "▶ Running extraction stage"
+	@echo "▶ Running extraction stage only"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	python -m etl_pipeline run --stage extract
 
-transform:
+etl:
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo "▶ Running transformation stage"
+	@echo "▶ Running extract + transform (no load)"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	python -m etl_pipeline run --stage transform
-
-load:
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo "▶ Running loading stage"
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	python -m etl_pipeline run --stage load
+	python -m etl_pipeline run --stage extract,transform
 
 scheduler:
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

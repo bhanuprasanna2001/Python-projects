@@ -44,23 +44,34 @@ console = Console()
 
 
 def _get_stage_list(stage: str | None) -> list[Stage] | None:
-    """Convert stage string to Stage enum list."""
+    """Convert stage string to Stage enum list.
+
+    Accepts comma-separated stages like 'extract,transform,load' or single stage.
+    """
     if stage is None:
         return None
 
     stage_map = {
-        "extract": [Stage.EXTRACT],
-        "transform": [Stage.TRANSFORM],
-        "load": [Stage.LOAD],
-        "all": None,
+        "extract": Stage.EXTRACT,
+        "transform": Stage.TRANSFORM,
+        "load": Stage.LOAD,
     }
 
-    if stage.lower() not in stage_map:
-        console.print(f"[red]Invalid stage: {stage}[/red]")
-        console.print(f"Valid stages: {', '.join(stage_map.keys())}")
-        raise typer.Exit(1)
+    # Handle 'all' as special case
+    if stage.lower() == "all":
+        return None
 
-    return stage_map[stage.lower()]
+    # Parse comma-separated stages
+    result: list[Stage] = []
+    for s in stage.split(","):
+        s = s.strip().lower()
+        if s not in stage_map:
+            console.print(f"[red]Invalid stage: {s}[/red]")
+            console.print(f"Valid stages: {', '.join(stage_map.keys())}, all")
+            raise typer.Exit(1)
+        result.append(stage_map[s])
+
+    return result if result else None
 
 
 def _get_source_list(sources: str | None) -> list[DataSource] | None:
@@ -92,7 +103,7 @@ def run(
         None,
         "--stage",
         "-s",
-        help="Run specific stage: extract, transform, load, or all",
+        help="Comma-separated stages: extract,transform,load or 'all'",
     ),
     sources: str | None = typer.Option(
         None,
@@ -110,9 +121,10 @@ def run(
     Run the ETL pipeline.
 
     Examples:
-        etl_pipeline run                    # Run full pipeline
-        etl_pipeline run --stage extract    # Run extraction only
-        etl_pipeline run --sources github   # Extract from GitHub only
+        etl_pipeline run                              # Run full pipeline
+        etl_pipeline run --stage extract              # Run extraction only
+        etl_pipeline run --stage extract,transform    # Run extract + transform
+        etl_pipeline run --sources github             # Extract from GitHub only
     """
     settings = get_settings()
     setup_logging(

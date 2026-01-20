@@ -329,5 +329,6 @@ class PipelineJob(BaseModel):
     def add_stage_result(self, result: StageResult) -> None:
         """Add a stage result to the job."""
         self.stages.append(result)
-        if result.status == JobStatus.FAILED:
+        # Count both FAILED and PARTIAL stages as having issues
+        if result.status in (JobStatus.FAILED, JobStatus.PARTIAL):
             self.error_count += 1

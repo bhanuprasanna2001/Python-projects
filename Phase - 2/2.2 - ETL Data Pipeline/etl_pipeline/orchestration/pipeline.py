@@ -14,7 +14,7 @@ from etl_pipeline.config import Settings, get_settings
 from etl_pipeline.exceptions import PipelineError
 from etl_pipeline.extractors import CSVExtractor, GitHubExtractor, SQLiteExtractor
 from etl_pipeline.extractors.base import BaseExtractor
-from etl_pipeline.loaders import SQLiteLoader
+from etl_pipeline.loaders import PostgresLoader, SQLiteLoader
 from etl_pipeline.loaders.base import BaseLoader
 from etl_pipeline.models import (
     DataSource,
@@ -28,10 +28,13 @@ from etl_pipeline.models import (
     TransformationResult,
     TransformedRecord,
 )
+from etl_pipeline.monitoring.alerts import configure_alerts
+from etl_pipeline.monitoring.metrics_collector import MetricsCollector
 from etl_pipeline.orchestration.job_store import get_job_store
 from etl_pipeline.transformers import DataCleaner, DataNormalizer, DataValidator
 from etl_pipeline.transformers.base import TransformerChain
 from etl_pipeline.utils.logging import get_logger, setup_logging
+from etl_pipeline.utils.metrics import get_pipeline_metrics
 
 
 class Pipeline:
@@ -41,9 +44,10 @@ class Pipeline:
     Coordinates:
     - Multiple extractors (GitHub, CSV, SQLite)
     - Transformer chain (Clean → Normalize → Validate)
-    - Loader (SQLite)
+    - Loader (SQLite or PostgreSQL)
 
     Tracks execution metrics and handles failures gracefully.
+    Integrates with monitoring and alerting systems.
     """
 
     def __init__(
@@ -74,8 +78,34 @@ class Pipeline:
         self.transformer_chain = self._create_transformer_chain()
         self.loader = loader or self._create_loader()
 
+        # Initialize monitoring
+        self._init_monitoring()
+
         # Job tracking
         self.current_job: PipelineJob | None = None
+
+    def _init_monitoring(self) -> None:
+        """Initialize monitoring and alerting from configuration."""
+        monitoring_config = self.settings.monitoring
+
+        # Setup metrics collector
+        self.metrics_collector: MetricsCollector | None = None
+        if monitoring_config.metrics_enabled:
+            self.metrics_collector = MetricsCollector(
+                metrics_path=monitoring_config.metrics_path,
+            )
+            self.logger.info("Metrics collector initialized")
+
+        # Setup alert manager
+        alerts_config = monitoring_config.alerts
+        self.alert_manager = configure_alerts(
+            webhook_url=alerts_config.webhook_url if alerts_config.enabled else None,
+            enabled=alerts_config.enabled,
+        )
+        self.logger.info(f"Alerting {'enabled' if alerts_config.enabled else 'disabled'}")
+
+        # Store pipeline metrics helper
+        self.pipeline_metrics = get_pipeline_metrics()
 
     def _create_extractors(self) -> list[BaseExtractor[Any]]:
         """Create extractors from configuration."""
@@ -127,7 +157,7 @@ class Pipeline:
             ),
             DataValidator(
                 min_completeness=config.quality.min_completeness,
-                fail_on_quality_error=False,
+                fail_on_quality_error=config.quality.fail_on_quality_error,
             ),
         ]
 
@@ -143,10 +173,20 @@ class Pipeline:
                 on_conflict=config.on_conflict,
                 batch_size=config.batch_size,
             )
+        elif config.target == "postgres":
+            pg_config = config.postgres
+            return PostgresLoader(
+                host=pg_config.host,
+                port=pg_config.port,
+                database=pg_config.database,
+                user=pg_config.user,
+                password=pg_config.password,
+                on_conflict=config.on_conflict,
+                batch_size=config.batch_size,
+            )
         else:
-            # PostgreSQL loader would go here
             raise PipelineError(
-                f"Unsupported loader target: {config.target}",
+                f"Unsupported loader target: {config.target}. Supported targets: sqlite, postgres",
                 stage="initialization",
             )
 
@@ -221,13 +261,56 @@ class Pipeline:
             # Determine final status
             if self.current_job.error_count > 0:
                 self.current_job.complete(JobStatus.PARTIAL)
+                # Alert on partial completion if configured
+                if self.settings.monitoring.alerts.on_degraded_quality:
+                    await self.alert_manager.pipeline_degraded(
+                        job_id=str(self.current_job.job_id),
+                        reason=f"{self.current_job.error_count} stage(s) had issues",
+                        metric="error_count",
+                        value=float(self.current_job.error_count),
+                    )
             else:
                 self.current_job.complete(JobStatus.COMPLETED)
+
+            # Record pipeline metrics
+            self.pipeline_metrics.record_pipeline_run(
+                status=self.current_job.status.value,
+                duration=self.current_job.duration_seconds or 0.0,
+                extracted=self.current_job.total_extracted,
+                transformed=self.current_job.total_transformed,
+                loaded=self.current_job.total_loaded,
+            )
 
         except Exception as e:
             self.logger.error(f"Pipeline failed: {e}", exc_info=True)
             self.current_job.complete(JobStatus.FAILED)
+
+            # Send failure alert
+            if self.settings.monitoring.alerts.on_failure:
+                await self.alert_manager.pipeline_failed(
+                    job_id=str(self.current_job.job_id),
+                    error=str(e),
+                    duration=self.current_job.duration_seconds,
+                )
+
+            # Re-raise after finally block persists the job
             raise
+
+        finally:
+            # Always persist job to job store (success or failure)
+            try:
+                job_store = get_job_store()
+                await job_store.save_job(self.current_job)
+                self.logger.debug(f"Job {self.current_job.job_id} persisted to job store")
+            except Exception as persist_error:
+                self.logger.warning(f"Failed to persist job to store: {persist_error}")
+
+            # Flush metrics to disk
+            if self.metrics_collector:
+                try:
+                    await self.metrics_collector.flush()
+                except Exception as metrics_error:
+                    self.logger.warning(f"Failed to flush metrics: {metrics_error}")
 
         self.logger.info(
             f"Pipeline completed with status '{self.current_job.status.value}'",
@@ -239,14 +322,6 @@ class Pipeline:
                 "loaded": self.current_job.total_loaded,
             },
         )
-
-        # Persist job to job store
-        try:
-            job_store = get_job_store()
-            await job_store.save_job(self.current_job)
-            self.logger.debug(f"Job {self.current_job.job_id} persisted to job store")
-        except Exception as e:
-            self.logger.warning(f"Failed to persist job to store: {e}")
 
         return self.current_job
 

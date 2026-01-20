@@ -1,0 +1,108 @@
+{
+  "collected_at": "2026-01-20T07:33:05.718829Z",
+  "registry": {
+    "uptime_seconds": 0.29,
+    "collected_at": "2026-01-20T07:33:05.718832Z",
+    "counters": {
+      "pipeline.runs_total{status=partial}": 10
+    },
+    "gauges": {
+      "pipeline.last_extracted": 5.0,
+      "pipeline.last_transformed": 5.0,
+      "pipeline.last_loaded": 5.0,
+      "pipeline.last_run_timestamp": 1768890785.71791
+    },
+    "timings": {
+      "context_op": {
+        "count": 1,
+        "total_seconds": 0.055,
+        "avg_seconds": 0.055,
+        "min_seconds": 0.055,
+        "max_seconds": 0.055,
+        "median_seconds": 0.055,
+        "p95_seconds": 0.055,
+        "p99_seconds": 0.055,
+        "stddev_seconds": 0.0
+      },
+      "pipeline.duration_seconds{status=partial}": {
+        "count": 10,
+        "total_seconds": 0.056,
+        "avg_seconds": 0.0056,
+        "min_seconds": 0.0015,
+        "max_seconds": 0.0107,
+        "median_seconds": 0.006,
+        "p95_seconds": 0.0107,
+        "p99_seconds": 0.0107,
+        "stddev_seconds": 0.0024
+      }
+    }
+  },
+  "pipeline": {
+    "extraction": {
+      "total_records": 0,
+      "total_runs": 0,
+      "total_errors": 0,
+      "timing": {
+        "count": 0,
+        "total_seconds": 0.0,
+        "avg_seconds": 0.0,
+        "min_seconds": 0,
+        "max_seconds": 0.0,
+        "median_seconds": 0.0,
+        "p95_seconds": 0.0,
+        "p99_seconds": 0.0,
+        "stddev_seconds": 0.0
+      }
+    },
+    "transformation": {
+      "total_input": 0,
+      "total_output": 0,
+      "total_dropped": 0,
+      "drop_ratio": 0.0,
+      "timing": {
+        "count": 0,
+        "total_seconds": 0.0,
+        "avg_seconds": 0.0,
+        "min_seconds": 0,
+        "max_seconds": 0.0,
+        "median_seconds": 0.0,
+        "p95_seconds": 0.0,
+        "p99_seconds": 0.0,
+        "stddev_seconds": 0.0
+      }
+    },
+    "loading": {
+      "total_inserted": 0,
+      "total_updated": 0,
+      "total_failed": 0,
+      "timing": {
+        "count": 0,
+        "total_seconds": 0.0,
+        "avg_seconds": 0.0,
+        "min_seconds": 0,
+        "max_seconds": 0.0,
+        "median_seconds": 0.0,
+        "p95_seconds": 0.0,
+        "p99_seconds": 0.0,
+        "stddev_seconds": 0.0
+      }
+    },
+    "pipeline": {
+      "total_runs": 10,
+      "last_extracted": 5.0,
+      "last_transformed": 5.0,
+      "last_loaded": 5.0,
+      "timing": {
+        "count": 0,
+        "total_seconds": 0.0,
+        "avg_seconds": 0.0,
+        "min_seconds": 0,
+        "max_seconds": 0.0,
+        "median_seconds": 0.0,
+        "p95_seconds": 0.0,
+        "p99_seconds": 0.0,
+        "stddev_seconds": 0.0
+      }
+    }
+  }
+}

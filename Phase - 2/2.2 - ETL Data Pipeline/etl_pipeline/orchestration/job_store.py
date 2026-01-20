@@ -18,7 +18,7 @@ from uuid import UUID
 
 import aiosqlite
 
-from etl_pipeline.config import get_project_root
+from etl_pipeline.config import get_project_root, get_settings
 from etl_pipeline.models import JobStatus, PipelineJob, Stage, StageResult
 from etl_pipeline.utils.logging import get_logger
 
@@ -413,9 +413,20 @@ class JobStore:
 _job_store: JobStore | None = None
 
 
-def get_job_store() -> JobStore:
-    """Get or create the global job store."""
+def get_job_store(path: str | Path | None = None) -> JobStore:
+    """Get or create the global job store.
+
+    Args:
+        path: Optional custom path. If not provided, uses settings.
+
+    Returns:
+        JobStore instance
+    """
     global _job_store
     if _job_store is None:
-        _job_store = JobStore()
+        if path is None:
+            # Use path from settings
+            settings = get_settings()
+            path = settings.pipeline.job_store_path
+        _job_store = JobStore(database_path=path)
     return _job_store

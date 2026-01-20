@@ -68,6 +68,7 @@ class QualityConfig(BaseModel):
 
     min_completeness: float = 0.8
     max_duplicates_ratio: float = 0.05
+    fail_on_quality_error: bool = False  # Whether to fail pipeline on quality issues
 
 
 class TransformationConfig(BaseModel):
@@ -165,6 +166,7 @@ class PipelineConfig(BaseModel):
 
     name: str = "multi-source-etl"
     description: str = "Aggregates data from multiple sources"
+    job_store_path: str = "data/jobs/job_store.db"
 
 
 class Settings(BaseSettings):
