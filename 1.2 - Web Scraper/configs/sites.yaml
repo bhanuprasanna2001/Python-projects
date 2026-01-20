@@ -1,8 +1,0 @@
-# Web Scraper Site Configurations
-# Each site has its own configuration with selectors and settings
-
-sites:
-  books:
-    name: "Books to Scrape"
-    base_url: "https://books.toscrape.com"
-    
