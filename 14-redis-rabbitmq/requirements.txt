@@ -1,0 +1,4 @@
+redis>=4.5.0
+aioredis>=2.0.0
+pika>=1.3.0
+aio-pika>=9.0.0

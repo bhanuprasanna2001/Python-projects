@@ -1,0 +1,232 @@
+version: '3.8'
+
+# =============================================================================
+# Microservices Demo - Docker Compose
+# =============================================================================
+# This docker-compose file sets up a complete microservices environment.
+# 
+# Services:
+# - API Gateway (port 8000)
+# - User Service (port 8001)
+# - Order Service (port 8002)
+# - Notification Service (port 8003)
+# 
+# Infrastructure:
+# - Consul (Service Discovery)
+# - RabbitMQ (Message Broker)
+# - Redis (Caching)
+#
+# Usage:
+#   docker-compose up -d
+#   docker-compose logs -f
+#   docker-compose down
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # Infrastructure Services
+  # ===========================================================================
+  
+  # Consul - Service Discovery and Configuration
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
+    ports:
+      - "8500:8500"   # HTTP API/UI
+      - "8600:8600/udp"  # DNS
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - microservices
+
+  # RabbitMQ - Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - microservices
+
+  # Redis - Caching and Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - microservices
+
+  # ===========================================================================
+  # Application Services (using Python images)
+  # ===========================================================================
+  # NOTE: In a real setup, each service would have its own Dockerfile.
+  # For this demo, we show the configuration without building images.
+  # To run the services locally instead:
+  #   python gateway/main.py
+  #   python services/user_service.py
+  #   python services/order_service.py
+  #   python services/notification_service.py
+  # ===========================================================================
+
+  # API Gateway
+  # gateway:
+  #   build:
+  #     context: ./gateway
+  #   container_name: api-gateway
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - USER_SERVICE_URL=http://user-service:8001
+  #     - ORDER_SERVICE_URL=http://order-service:8002
+  #     - NOTIFICATION_SERVICE_URL=http://notification-service:8003
+  #     - CONSUL_HOST=consul
+  #     - REDIS_HOST=redis
+  #   depends_on:
+  #     - consul
+  #     - redis
+  #   networks:
+  #     - microservices
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+  # User Service
+  # user-service:
+  #   build:
+  #     context: ./services/user
+  #   container_name: user-service
+  #   ports:
+  #     - "8001:8001"
+  #   environment:
+  #     - DATABASE_URL=postgresql://user:pass@postgres:5432/users
+  #     - CONSUL_HOST=consul
+  #     - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+  #   depends_on:
+  #     - consul
+  #     - rabbitmq
+  #   networks:
+  #     - microservices
+
+  # Order Service
+  # order-service:
+  #   build:
+  #     context: ./services/order
+  #   container_name: order-service
+  #   ports:
+  #     - "8002:8002"
+  #   environment:
+  #     - DATABASE_URL=postgresql://user:pass@postgres:5432/orders
+  #     - CONSUL_HOST=consul
+  #     - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+  #     - USER_SERVICE_URL=http://user-service:8001
+  #   depends_on:
+  #     - consul
+  #     - rabbitmq
+  #   networks:
+  #     - microservices
+
+  # Notification Service
+  # notification-service:
+  #   build:
+  #     context: ./services/notification
+  #   container_name: notification-service
+  #   ports:
+  #     - "8003:8003"
+  #   environment:
+  #     - CONSUL_HOST=consul
+  #     - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+  #     - REDIS_HOST=redis
+  #   depends_on:
+  #     - consul
+  #     - rabbitmq
+  #     - redis
+  #   networks:
+  #     - microservices
+
+# =============================================================================
+# Networks
+# =============================================================================
+
+networks:
+  microservices:
+    driver: bridge
+    name: microservices-network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+
+volumes:
+  redis-data:
+    name: microservices-redis-data
+
+# =============================================================================
+# USAGE INSTRUCTIONS
+# =============================================================================
+#
+# 1. Start infrastructure services:
+#    docker-compose up -d consul rabbitmq redis
+#
+# 2. Check services are healthy:
+#    docker-compose ps
+#
+# 3. Access service UIs:
+#    - Consul: http://localhost:8500
+#    - RabbitMQ: http://localhost:15672 (guest/guest)
+#
+# 4. Run Python services locally:
+#    cd /path/to/20-microservices
+#    
+#    # Terminal 1: User Service
+#    python services/user_service.py
+#    
+#    # Terminal 2: Order Service
+#    python services/order_service.py
+#    
+#    # Terminal 3: Notification Service
+#    python services/notification_service.py
+#    
+#    # Terminal 4: API Gateway
+#    python gateway/main.py
+#
+# 5. Test the system:
+#    # List users
+#    curl http://localhost:8000/users
+#    
+#    # Get user profile with orders
+#    curl http://localhost:8000/users/1/profile
+#    
+#    # Check services health
+#    curl http://localhost:8000/services/health
+#
+# 6. Stop everything:
+#    docker-compose down
+#    docker-compose down -v  # Also remove volumes
+#
+# =============================================================================

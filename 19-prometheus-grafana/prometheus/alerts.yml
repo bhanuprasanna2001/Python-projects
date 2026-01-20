@@ -1,0 +1,114 @@
+# Alert Rules
+
+groups:
+  - name: application_alerts
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m])) 
+            / 
+            sum(rate(http_requests_total[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      # High latency
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency detected"
+          description: "95th percentile latency is {{ $value | humanizeDuration }}"
+
+      # Service down
+      - alert: ServiceDown
+        expr: up{job="fastapi-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "{{ $labels.instance }} has been down for more than 1 minute"
+
+      # High request rate (potential DDoS)
+      - alert: HighRequestRate
+        expr: |
+          sum(rate(http_requests_total[1m])) > 1000
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Unusually high request rate"
+          description: "Request rate is {{ $value | humanize }} req/s"
+
+  - name: resource_alerts
+    rules:
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: |
+          (
+            process_cpu_seconds_total 
+            / 
+            on(instance) group_left() 
+            machine_cpu_cores
+          ) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value | humanize }}%"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            process_resident_memory_bytes 
+            / 
+            node_memory_MemTotal_bytes
+          ) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanize }}%"
+
+  - name: business_alerts
+    rules:
+      # Low order rate (business metric)
+      - alert: LowOrderRate
+        expr: |
+          sum(rate(orders_created_total[1h])) < 10
+        for: 30m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low order rate"
+          description: "Only {{ $value | humanize }} orders/hour in the last 30 minutes"
+
+      # High cart abandonment
+      - alert: HighCartAbandonment
+        expr: |
+          (
+            sum(rate(carts_abandoned_total[1h]))
+            /
+            sum(rate(carts_created_total[1h]))
+          ) > 0.7
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "High cart abandonment rate"
+          description: "Cart abandonment rate is {{ $value | humanizePercentage }}"
