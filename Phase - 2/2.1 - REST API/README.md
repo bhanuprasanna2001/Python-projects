@@ -154,6 +154,21 @@ A REST API for managing bookmarks with collections and tags, built with FastAPI,
 |--------|----------|-------------|
 | GET | `/health` | Health check |
 
+## Deployment
+
+### Render.com
+```bash
+# Push to GitHub
+git push origin main
+
+# Deploy: Connect repo at render.com → New Blueprint → Auto-deploy from render.yaml
+```
+
+### Test Live API
+```bash
+python examples/test_live_api.py
+```
+
 ## Development
 
 ### Commands
